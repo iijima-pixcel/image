@@ -10,15 +10,15 @@ jobs:
     steps:
       - checkout
       - aws-cli/setup:
-          aws_access_key_id: AWS_ACCESS_KEY_ID
-          aws_secret_access_key: AWS_SECRET_ACCESS_KEY
-          region: AWS_DEFAULT_REGION
+          aws_access_key_id: $AWS_ACCESS_KEY_ID
+          aws_secret_access_key: $AWS_SECRET_ACCESS_KEY
+          region: $AWS_DEFAULT_REGION
       - run:
           name: cloud-formation deploy
           command: 
-            aws cloudformation deploy --template cloud/network.yml --stack-name network
+            aws cloudformation deploy --template-file cloud/network.yml --stack-name network
           
-  workflows: 
-    cloud-formation-workflow: 
+workflows: 
+   cloud-formation-workflow: 
       jobs:
-        - execute-cloud-formation
+        - cloud-formation
