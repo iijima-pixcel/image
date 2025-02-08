@@ -1,0 +1,115 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  CidrIpFromInternet:
+    Type: String
+    Description: CIDR IP range for allowing access from the internet
+    Default: !Sub "{{resolve:ssm:/network/cidr_ip}}"
+
+Resources: 
+#ControleNodeのセキュリティグループ
+  ControlNodeSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: ControlNodeSecurityGroup
+      GroupDescription: Security group for SSH HTTP access
+      VpcId: !ImportValue Lesson14vpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref CidrIpFromInternet
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          IpProtocol: -1
+      Tags:
+        - Key: Name
+          Value: ControlNodeSecurityGroup
+#TargetNodeのセキュリティグループ
+  Lesson14Ec2SecurityGroup: 
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: Lesson14Ec2SecurityGroup
+      GroupDescription: Security group for SSH HTTP access
+      VpcId: !ImportValue Lesson14VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          SourceSecurityGroupId: !GetAtt ControlNodeSecurityGroup
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 3000
+          ToPort: 3000
+          SourceSecurityGroupId: !Ref ControlNodeSecurityGroup
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          SourceSecurityGroupId: !GetAtt ALBSecurity.GroupId
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          IpProtocol: -1
+      Tags:
+        - Key: Name
+          Value: Lesson14Ec2SecurityGroup
+#ALBのセキュリティグループ
+  ALBSecurity:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: ALBSecurity
+      GroupDescription: ALB for HTTP access
+      VpcId: !ImportValue Lesson14VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          IpProtocol: -1
+      Tags:
+        - Key: Name
+          Value: L14ALBSecurity 
+#RDSのセキュリティグループ  
+  L14RDSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !ImportValue Lesson14VpcId
+      GroupDescription: Access to rds is only from this ec2
+      SecurityGroupIngress:
+          IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          SourceSecurityGroupId: !GetAtt Lesson14Ec2SecurityGroup.GroupId
+      Tags:
+        - Key: Name
+          Value: L14RDSSecurity     
+#Output Parameters
+Outputs:
+    L14Ec2SecurityGpId:
+      Description: L14Ec2SecurityGroup
+      Value: !Ref Lesson14Ec2SecurityGroup
+      Export: 
+        Name: L14Ec2SecurityGpId
+    ALBSecurityGpId:
+      Description: ALBSecurityGroup
+      Value: !Ref ALBSecurity
+      Export: 
+        Name: ALBSecurityGpId
+    L14RDSSecurityGpId:
+      Description: L14RDSSecurityGroup
+      Value: !Ref L14RDSSecurityGroup
+      Export: 
+        Name: L14RDSSecurityGpId       
+    ControlNodeSecurityGroupId:
+      Description: ControlNodeSecurityGroup
+      Value: !Ref ControlNodeSecurityGroup
+      Export: 
+        Name: ControlNodeSecurityGroupId

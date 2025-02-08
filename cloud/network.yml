@@ -1,0 +1,155 @@
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  AZ1A:
+    Description: Please input Availability Zone
+    Type: AWS::EC2::AvailabilityZone::Name
+    Default: ap-northeast-1a
+  AZ1C:
+    Description: Please input Availability Zone
+    Type: AWS::EC2::AvailabilityZone::Name
+    Default: ap-northeast-1c
+
+Resources: 
+#vpcの作成
+  Lesson14Vpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      Tags:
+        - Key: Name
+          Value: Lesson14Vpc
+#subnetの作成
+  Public1aL14:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Ref AZ1A
+      VpcId: !Ref Lesson14Vpc
+      CidrBlock: 10.0.0.0/20
+      Tags:
+        - Key: Name
+          Value: Public1aL14
+  Private1aL14:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Ref AZ1A
+      VpcId: !Ref Lesson14Vpc
+      CidrBlock: 10.0.128.0/20
+      Tags:
+        - Key: Name
+          Value: Private1aL14
+  Public1cL14:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Ref AZ1C
+      VpcId: !Ref Lesson14Vpc
+      CidrBlock: 10.0.16.0/20
+      Tags:
+        - Key: Name
+          Value: Public1cL14
+  Private1cL14:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Ref AZ1C
+      VpcId: !Ref Lesson14Vpc
+      CidrBlock: 10.0.144.0/20
+      Tags:
+        - Key: Name
+          Value: Private1cL14
+#インターネットゲートウェイ・パブリックサブネットのルートテーブルの作成
+  Lesson14Gw:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+     Tags:
+       - Key: Name
+         Value: Lesson14Gw
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref Lesson14Vpc
+      InternetGatewayId: !Ref Lesson14Gw
+  Lesson14RoutePublic:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref Lesson14Vpc
+      Tags:
+        - Key: Name
+          Value: Lesson14RoutePublic
+  RouteTableAssocNamePublic1a:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref Public1aL14 
+      RouteTableId: !Ref Lesson14RoutePublic
+  RouteNamePublic:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref Lesson14RoutePublic
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref Lesson14Gw
+  RouteTableAssocNamePublic1c:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref Public1cL14
+      RouteTableId: !Ref Lesson14RoutePublic
+#プライベートサブネットのルートテーブルの作成
+  Lesson14RoutePrivate1a:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref Lesson14Vpc
+      Tags: 
+        - Key: Name
+          Value: Lesson14RoutePrivate1a
+  RouteTableAssocNamePrivate1a:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref Private1aL14 
+      RouteTableId: !Ref Lesson14RoutePrivate1a
+  Lesson14RoutePrivate1c:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref Lesson14Vpc
+      Tags:
+        - Key: Name
+          Value: Lesson14RoutePrivate1c
+  RouteTableAssocNamePrivate1c:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref Private1cL14
+      RouteTableId: !Ref Lesson14RoutePrivate1c
+#VPCS3EndPointの作成
+  GatewayS3Endpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      RouteTableIds:
+        - !Ref Lesson14RoutePrivate1a
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.s3"
+      VpcEndpointType: Gateway
+      VpcId: !Ref Lesson14Vpc
+#Output Parameters
+Outputs:
+  Public1aId:
+    Description: subnet from Public1aL14
+    Value: !Ref Public1aL14 
+    Export: 
+      Name: Public1aId  
+  Public1cId:
+    Description: subnet from Public1cL14
+    Value: !Ref Public1cL14 
+    Export: 
+      Name: Public1cId
+  Private1aId:
+    Description: subnet from Private1aL14
+    Value: !Ref Private1aL14
+    Export: 
+      Name: Private1aId
+  Private1cId:
+    Description: subnet from Private1cL14
+    Value: !Ref Private1cL14
+    Export: 
+      Name: Private1cId
+  Lesson14VpcId:
+    Description: Lesson14Vpc
+    Value: !Ref Lesson14Vpc
+    Export: 
+      Name: Lesson14VpcId
+          
