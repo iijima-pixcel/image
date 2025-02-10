@@ -11,145 +11,145 @@ Parameters:
 
 Resources: 
 #vpcの作成
-  Lesson14Vpc:
+  Lesson13Vpc:
     Type: AWS::EC2::VPC
     Properties:
       CidrBlock: 10.0.0.0/16
       EnableDnsSupport: true
       Tags:
         - Key: Name
-          Value: Lesson14Vpc
+          Value: Lesson13Vpc
 #subnetの作成
-  Public1aL14:
+  Public1aL13:
     Type: AWS::EC2::Subnet
     Properties:
       AvailabilityZone: !Ref AZ1A
-      VpcId: !Ref Lesson14Vpc
+      VpcId: !Ref Lesson13Vpc
       CidrBlock: 10.0.0.0/20
       Tags:
         - Key: Name
-          Value: Public1aL14
-  Private1aL14:
+          Value: Public1aL13
+  Private1aL13:
     Type: AWS::EC2::Subnet
     Properties:
       AvailabilityZone: !Ref AZ1A
-      VpcId: !Ref Lesson14Vpc
+      VpcId: !Ref Lesson13Vpc
       CidrBlock: 10.0.128.0/20
       Tags:
         - Key: Name
-          Value: Private1aL14
-  Public1cL14:
+          Value: Private1aL13
+  Public1cL13:
     Type: AWS::EC2::Subnet
     Properties:
       AvailabilityZone: !Ref AZ1C
-      VpcId: !Ref Lesson14Vpc
+      VpcId: !Ref Lesson13Vpc
       CidrBlock: 10.0.16.0/20
       Tags:
         - Key: Name
-          Value: Public1cL14
-  Private1cL14:
+          Value: Public1cL13
+  Private1cL13:
     Type: AWS::EC2::Subnet
     Properties:
       AvailabilityZone: !Ref AZ1C
-      VpcId: !Ref Lesson14Vpc
-      CidrBlock: 10.0.144.0/20
+      VpcId: !Ref Lesson13Vpc
+      CidrBlock: 10.0.16.0/20
       Tags:
         - Key: Name
-          Value: Private1cL14
+          Value: Private1cL13
 #インターネットゲートウェイ・パブリックサブネットのルートテーブルの作成
-  Lesson14Gw:
+  Lesson13Gw:
     Type: AWS::EC2::InternetGateway
     Properties:
      Tags:
        - Key: Name
-         Value: Lesson14Gw
+         Value: Lesson13Gw
   AttachGateway:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
-      VpcId: !Ref Lesson14Vpc
-      InternetGatewayId: !Ref Lesson14Gw
-  Lesson14RoutePublic:
+      VpcId: !Ref Lesson13Vpc
+      InternetGatewayId: !Ref Lesson13Gw
+  Lesson13RoutePublic:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId: !Ref Lesson14Vpc
+      VpcId: !Ref Lesson13Vpc
       Tags:
         - Key: Name
-          Value: Lesson14RoutePublic
+          Value: Lesson13RoutePublic
   RouteTableAssocNamePublic1a:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref Public1aL14 
-      RouteTableId: !Ref Lesson14RoutePublic
+      SubnetId: !Ref Public1aL13 
+      RouteTableId: !Ref Lesson13RoutePublic
   RouteNamePublic:
     Type: AWS::EC2::Route
     Properties:
-      RouteTableId: !Ref Lesson14RoutePublic
+      RouteTableId: !Ref Lesson13RoutePublic
       DestinationCidrBlock: 0.0.0.0/0
-      GatewayId: !Ref Lesson14Gw
+      GatewayId: !Ref Lesson13Gw
   RouteTableAssocNamePublic1c:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref Public1cL14
-      RouteTableId: !Ref Lesson14RoutePublic
+      SubnetId: !Ref Public1cL13
+      RouteTableId: !Ref Lesson13RoutePublic
 #プライベートサブネットのルートテーブルの作成
-  Lesson14RoutePrivate1a:
+  Lesson13RoutePrivate1a:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId: !Ref Lesson14Vpc
+      VpcId: !Ref Lesson13Vpc
       Tags: 
         - Key: Name
-          Value: Lesson14RoutePrivate1a
+          Value: Lesson13RoutePrivate1a
   RouteTableAssocNamePrivate1a:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref Private1aL14 
-      RouteTableId: !Ref Lesson14RoutePrivate1a
-  Lesson14RoutePrivate1c:
+      SubnetId: !Ref Private1aL13 
+      RouteTableId: !Ref Lesson13RoutePrivate1a
+  Lesson13RoutePrivate1c:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId: !Ref Lesson14Vpc
+      VpcId: !Ref Lesson13Vpc
       Tags:
         - Key: Name
-          Value: Lesson14RoutePrivate1c
+          Value: Lesson13RoutePrivate1c
   RouteTableAssocNamePrivate1c:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref Private1cL14
-      RouteTableId: !Ref Lesson14RoutePrivate1c
+      SubnetId: !Ref Private1cL13
+      RouteTableId: !Ref Lesson13RoutePrivate1c
 #VPCS3EndPointの作成
   GatewayS3Endpoint:
     Type: AWS::EC2::VPCEndpoint
     Properties:
       RouteTableIds:
-        - !Ref Lesson14RoutePrivate1a
+        - !Ref Lesson13RoutePrivate1a
       ServiceName: !Sub "com.amazonaws.${AWS::Region}.s3"
       VpcEndpointType: Gateway
-      VpcId: !Ref Lesson14Vpc
+      VpcId: !Ref Lesson13Vpc
 #Output Parameters
 Outputs:
   Public1aId:
-    Description: subnet from Public1aL14
-    Value: !Ref Public1aL14 
+    Description: subnet from Public1aL13
+    Value: !Ref Public1aL13 
     Export: 
-      Name: Public1aId  
+      Name: Public1a13Id  
   Public1cId:
-    Description: subnet from Public1cL14
-    Value: !Ref Public1cL14 
+    Description: subnet from Public1cL13
+    Value: !Ref Public1cL13 
     Export: 
-      Name: Public1cId
+      Name: Public1c13Id
   Private1aId:
-    Description: subnet from Private1aL14
-    Value: !Ref Private1aL14
+    Description: subnet from Private1aL13
+    Value: !Ref Private1aL13
     Export: 
-      Name: Private1aId
+      Name: Private1a13Id
   Private1cId:
-    Description: subnet from Private1cL14
-    Value: !Ref Private1cL14
+    Description: subnet from Private1cL13
+    Value: !Ref Private1cL13
     Export: 
-      Name: Private1cId
-  Lesson14VpcId:
-    Description: Lesson14Vpc
-    Value: !Ref Lesson14Vpc
+      Name: Private1c13Id
+  Lesson13VpcId:
+    Description: Lesson13Vpc
+    Value: !Ref Lesson13Vpc
     Export: 
-      Name: Lesson14VpcId
+      Name: Lesson13VpcId
           

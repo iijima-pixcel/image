@@ -13,7 +13,7 @@ Resources:
     Properties:
       GroupName: ControlNodeSecurityGroup
       GroupDescription: Security group for SSH HTTP access
-      VpcId: !ImportValue Lesson14vpcId
+      VpcId: !ImportValue Lesson13vpcId
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 22
@@ -30,12 +30,12 @@ Resources:
         - Key: Name
           Value: ControlNodeSecurityGroup
 #TargetNodeのセキュリティグループ
-  Lesson14Ec2SecurityGroup: 
+  Lesson13Ec2SecurityGroup: 
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupName: Lesson14Ec2SecurityGroup
+      GroupName: Lesson13Ec2SecurityGroup
       GroupDescription: Security group for SSH HTTP access
-      VpcId: !ImportValue Lesson14VpcId
+      VpcId: !ImportValue Lesson13VpcId
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 22
@@ -58,14 +58,14 @@ Resources:
           IpProtocol: -1
       Tags:
         - Key: Name
-          Value: Lesson14Ec2SecurityGroup
+          Value: Lesson13Ec2SecurityGroup
 #ALBのセキュリティグループ
   ALBSecurity:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupName: ALBSecurity
       GroupDescription: ALB for HTTP access
-      VpcId: !ImportValue Lesson14VpcId
+      VpcId: !ImportValue Lesson13VpcId
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 80
@@ -76,38 +76,38 @@ Resources:
           IpProtocol: -1
       Tags:
         - Key: Name
-          Value: L14ALBSecurity 
+          Value: L13ALBSecurity 
 #RDSのセキュリティグループ  
-  L14RDSSecurityGroup:
+  L13RDSSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      VpcId: !ImportValue Lesson14VpcId
+      VpcId: !ImportValue Lesson13VpcId
       GroupDescription: Access to rds is only from this ec2
       SecurityGroupIngress:
           IpProtocol: tcp
           FromPort: 3306
           ToPort: 3306
-          SourceSecurityGroupId: !GetAtt Lesson14Ec2SecurityGroup.GroupId
+          SourceSecurityGroupId: !GetAtt Lesson13Ec2SecurityGroup.GroupId
       Tags:
         - Key: Name
-          Value: L14RDSSecurity     
+          Value: L13RDSSecurity     
 #Output Parameters
 Outputs:
-    L14Ec2SecurityGpId:
-      Description: L14Ec2SecurityGroup
-      Value: !Ref Lesson14Ec2SecurityGroup
+    L13Ec2SecurityGpId:
+      Description: L13Ec2SecurityGroup
+      Value: !Ref Lesson13Ec2SecurityGroup
       Export: 
-        Name: L14Ec2SecurityGpId
+        Name: L13Ec2SecurityGpId
     ALBSecurityGpId:
       Description: ALBSecurityGroup
       Value: !Ref ALBSecurity
       Export: 
         Name: ALBSecurityGpId
-    L14RDSSecurityGpId:
-      Description: L14RDSSecurityGroup
-      Value: !Ref L14RDSSecurityGroup
+    L13RDSSecurityGpId:
+      Description: L13RDSSecurityGroup
+      Value: !Ref L13RDSSecurityGroup
       Export: 
-        Name: L14RDSSecurityGpId       
+        Name: L13RDSSecurityGpId       
     ControlNodeSecurityGroupId:
       Description: ControlNodeSecurityGroup
       Value: !Ref ControlNodeSecurityGroup
